@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Radhu, will you be mine? 💍❤️</title>
+  <meta name="description" content="A cute, interactive proposal page for Radhu" />
+  <style>
+    :root {
+      --primary: #ff4d6d;
+      --accent: #ffd166;
+      --bg1: #0f0c29;
+      --bg2: #302b63;
+      --bg3: #24243e;
+      --text: #fff;
+      --muted: rgba(255,255,255,.6);
+      --shadow: 0 20px 40px rgba(0,0,0,.2);
+      --radius: 22px;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif;
+      color: var(--text);
+      scroll-behavior: smooth;
+      background: linear-gradient(-45deg, var(--bg1), var(--bg2), var(--bg3));
+      background-size: 400% 400%;
+      animation: gradientMove 15s ease infinite;
+      overflow-x: hidden;
+    }
+
+    canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+
+    .hearts { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+    .hearts span {
+      position: absolute; display: block; color: rgba(255,255,255,.15);
+      animation: floatUp linear infinite;
+      will-change: transform, opacity;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(110vh) scale(.6) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(-20vh) scale(1.1) rotate(360deg); opacity: 0; }
+    }
+
+    main { position: relative; z-index: 2; }
+    section {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 6rem 1.5rem 4rem;
+      text-align: center;
+    }
+    h1, h2, h3 { margin: .5rem 0 1rem; line-height: 1.1; }
+    h1 { font-size: clamp(2.2rem, 7vw, 4.2rem); }
+    h2 { font-size: clamp(1.8rem, 6vw, 3rem); }
+    p { max-width: 760px; margin: .5rem auto 1rem; font-size: 1.1rem; color: var(--muted); }
+
+    .card {
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      max-width: 920px;
+      margin: 1rem auto;
+    }
+
+    .typewriter { min-height: 120px; font-size: 1.4rem; line-height: 1.6; }
+    .blinker { border-right: 2px solid var(--accent); animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { border-color: transparent; } }
+
+    .reasons {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; margin-top: 1.2rem;
+    }
+    .reason {
+      background: rgba(255,255,255,.06); border-radius: var(--radius); padding: 1rem 1.2rem; box-shadow: var(--shadow);
+      transition: transform .2s; position: relative; overflow: hidden;
+    }
+    .reason:hover { transform: translateY(-4px) scale(1.01); }
+    .reason::after {
+      content: "❤"; position: absolute; right: 12px; bottom: 8px; opacity: .12; font-size: 2rem;
+    }
+
+    .btns { display: flex; gap: .8rem; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+    button {
+      border: none; outline: 0; cursor: pointer; font-size: 1.1rem; padding: .9rem 1.6rem; border-radius: 999px; transition: transform .2s, box-shadow .2s;
+    }
+    button:active { transform: scale(.98); }
+    #yesBtn { background: var(--primary); color: #fff; box-shadow: 0 10px 20px rgba(255,77,109,.25); }
+    #noBtn { background: rgba(255,255,255,.15); color: #fff; }
+
+    .final-message { display: none; margin-top: 2rem; animation: pop .4s ease both; }
+    @keyframes pop {
+      0% { transform: scale(.7) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .small { font-size: .95rem; opacity: .7; }
+    a.link { color: var(--accent); text-decoration: none; }
+
+    .audio-toggle {
+      position: fixed; right: 16px; bottom: 16px; z-index: 10; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.1); box-shadow: var(--shadow); border-radius: 999px; padding: .6rem 1rem; cursor: pointer;
+    }
+
+    .footer { padding: 1.5rem 1rem 2.5rem; text-align: center; color: var(--muted); font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <div class="hearts" id="hearts"></div>
+
+  <button id="audioToggle" class="audio-toggle" hidden>🔊 Play music</button>
+  <audio id="bgm" preload="auto" loop>
+    <!-- Replace song.mp3 with your own romantic track if you like -->
+    <source src="song.mp3" type="audio/mpeg" />
+  </audio>
+
+  <main>
+    <!-- Hero / Intro -->
+    <section id="hero">
+      <div class="card">
+        <h1>Hey <span id="herName">Radhu</span>… 💖</h1>
+        <div id="typewriter" class="typewriter"></div>
+        <div class="btns">
+          <a href="#reasons" class="link">Scroll kar ke dekhna ↓</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reasons Section -->
+    <section id="reasons">
+      <h2>Top <span id="reasonCount"></span> reasons <span id="proposerName">(Your Name)</span> **you** se pyaar karta/ karti hai 💫</h2>
+      <p>Bas thode likh paya/ payi hoon, warna reasons toh infinite hain…</p>
+      <div class="reasons" id="reasonsGrid"></div>
+    </section>
+
+    <!-- The Big Question -->
+    <section id="question">
+      <div class="card">
+        <h2>So… Will you be mine, <span id="herName2">Radhu</span>? 💍</h2>
+        <p class="small">(Soch lo… yes bolte hi fireworks, confetti, sab kuch ho jayega 🤭)</p>
+        <div class="btns">
+          <button id="yesBtn">YES! 💘</button>
+          <button id="noBtn">Nahi 😜</button>
+        </div>
+        <div id="final" class="final-message">
+          <h2>Yaaay! 🤩 Thank you, <span id="herName3">Radhu</span>!<br/>Let's start our forever. ♾️</h2>
+          <p>
+            Mujhe turant message karo 👉
+            <a id="whLink" class="link" target="_blank" rel="noopener">WhatsApp par</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Made with 💙 by <span id="proposerName2">Your Name</span> • <span class="small">(Customize this page text in the code)</span>
+  </footer>
+
+  <script>
+    // ---------------- CUSTOMIZE HERE ----------------
+    const CONFIG = {
+      herName: 'Radhu',           // Jisko propose kar rahe ho
+      proposer: 'Zaid khan',      // Aapka naam
+      Insta ID: '@p.b.x_zaid', // 
+      song: 'song.mp3',           // optional background music
+      messages: [
+        'Tumhari hasi, tumhari baatein, aur tumhara care… sab kuch bilkul perfect lagta hai. ✨',
+        'Har din, har moment tumhare saath imagine karta/ karti hoon. ❤️',
+        'Isliye aaj, thoda hatke tarike se, ek sawaal puchna chahta/ chahti hoon…'
+      ],
+      reasons: [
+        'Tumhari smile mere worst din ko bhi best bana deti hai',
+        'Tumhara care aur concern priceless hai',
+        'Tumhari honesty aur simplicity unbeatable hai',
+        'Tume dekhte hi mann bilkul calm ho jata hai',
+        'Tumhari funny one-liners, uff! 😂',
+        'Tumhari aankhen… bas, kuch kehne ki zarurat hi nahi',
+        'Tumhare saath sab kuch thoda zyada special lagta hai',
+        'You believe in me, even when I doubt myself',
+        'Tum ho toh sab kuch possible lagta hai',
+        'Because… it’s *YOU*. Always you.'
+      ]
+    };
+    // -------------------------------------------------
+
+    // Inject names and counts
+    document.getElementById('herName').textContent = CONFIG.herName;
+    document.getElementById('herName2').textContent = CONFIG.herName;
+    document.getElementById('herName3').textContent = CONFIG.herName;
+    document.getElementById('proposerName').textContent = CONFIG.proposer;
+    document.getElementById('proposerName2').textContent = CONFIG.proposer;
+    document.getElementById('reasonCount').textContent = CONFIG.reasons.length;
+
+    // WhatsApp link
+    const wh = document.getElementById('whLink');
+    wh.href = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent('YES! 💞 ' + CONFIG.proposer + ' – I said yes!')}`;
+
+    // Create reasons
+    const grid = document.getElementById('reasonsGrid');
+    CONFIG.reasons.forEach((r, i) => {
+      const div = document.createElement('div');
+      div.className = 'reason';
+      div.innerHTML = `<h3>#${i+1}</h3><p>${r}</p>`;
+      grid.appendChild(div);
+    });
+
+    // Typewriter
+    const twEl = document.getElementById('typewriter');
+    const speed = 35; // ms per char
+    const pauseBetween = 1200; // ms between lines
+    let msgIndex = 0;
+    let charIndex = 0;
+
+    function typeNext() {
+      if (msgIndex >= CONFIG.messages.length) {
+        twEl.classList.remove('blinker');
+        return;
+      }
+      const current = CONFIG.messages[msgIndex];
+      twEl.innerHTML = current.slice(0, charIndex) + '<span class="blinker"></span>';
+      if (charIndex < current.length) {
+        charIndex++;
+        setTimeout(typeNext, speed);
+      } else {
+        msgIndex++;
+        charIndex = 0;
+        setTimeout(typeNext, pauseBetween);
+      }
+    }
+    typeNext();
+
+    // Moving NO button
+    const noBtn = document.getElementById('noBtn');
+    noBtn.addEventListener('mouseenter', moveNo);
+    noBtn.addEventListener('click', moveNo);
+
+    function moveNo() {
+      const btn = noBtn;
+      const w = window.innerWidth - btn.offsetWidth - 30;
+      const h = window.innerHeight - btn.offsetHeight - 30;
+      const x = Math.random() * w;
+      const y = Math.random() * h;
+      btn.style.position = 'fixed';
+      btn.style.left = x + 'px';
+      btn.style.top = y + 'px';
+    }
+
+    // YES button
+    const yesBtn = document.getElementById('yesBtn');
+    yesBtn.addEventListener('click', () => {
+      confettiBurst();
+      document.getElementById('final').style.display = 'block';
+      window.location.hash = '#question';
+    });
+
+    // Hearts background
+    const hearts = document.getElementById('hearts');
+    const totalHearts = 28;
+    for (let i = 0; i < totalHearts; i++) {
+      const s = document.createElement('span');
+      s.textContent = '❤';
+      const size = Math.random() * 28 + 12; // 12 - 40px
+      s.style.fontSize = size + 'px';
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.animationDuration = (Math.random() * 12 + 8) + 's';
+      s.style.animationDelay = (Math.random() * 6) + 's';
+      s.style.opacity = Math.random() * .18 + .05;
+      hearts.appendChild(s);
+    }
+
+    // Optional BGM play button (auto-play usually blocked)
+    const audio = document.getElementById('bgm');
+    const audioToggle = document.getElementById('audioToggle');
+    if (CONFIG.song && CONFIG.song !== 'song.mp3') {
+      audio.querySelector('source').src = CONFIG.song;
+      audio.load();
+    }
+    // Show button anyway, many browsers block autoplay. Let user choose.
+    audioToggle.hidden = false;
+    audioToggle.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play().catch(()=>{});
+        audioToggle.textContent = '⏸️ Pause music';
+      } else {
+        audio.pause();
+        audioToggle.textContent = '🔊 Play music';
+      }
+    });
+
+    /* Confetti (tiny, no external libs) */
+    const confettiCanvas = document.getElementById('confetti');
+    const ctx = confettiCanvas.getContext('2d');
+    let confettiPieces = [];
+    let confettiActive = false;
+    function resize() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function randomColor() {
+      const colors = ['#ff4d6d','#ffd166','#06d6a0','#118ab2','#ef476f','#f72585','#4cc9f0'];
+      return colors[Math.floor(Math.random()*colors.length)];
+    }
+
+    function confettiBurst() {
+      confettiActive = true;
+      const count = 250;
+      confettiPieces = [];
+      for (let i = 0; i < count; i++) {
+        confettiPieces.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * - confettiCanvas.height * 0.2,
+          w: Math.random() * 8 + 4,
+          h: Math.random() * 14 + 6,
+          color: randomColor(),
+          speed: Math.random() * 3 + 2,
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 14
+        });
+      }
+      requestAnimationFrame(drawConfetti);
+      // stop after 8s
+      setTimeout(()=> confettiActive = false, 8000);
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
+      if (!confettiActive && confettiPieces.length === 0) return;
+      confettiPieces.forEach((p) => {
+        p.y += p.speed;
+        p.rotation += p.rotationSpeed;
+        if (p.y > confettiCanvas.height + 20) {
+          // recycle
+          p.y = -20; p.x = Math.random() * confettiCanvas.width;
+        }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      requestAnimationFrame(drawConfetti);
+    }
+  </script>
+</body>
+</html>
